@@ -19,7 +19,7 @@ module.exports.GET_ALL_VEHICLE = (async (req, res) => {
 module.exports.ADD_VEHICLE = (async (req, res) => {
     const { vehicleCompany, vehicleModel, batteryCapacity, timeToFullInLevel1, timeToFullInLevel2, timeToFullInLevel3 } = req.body;
 
-    EVVehicles.findOne({ vehicleName: vehicleName, vehicleCompany: vehicleCompany, vehicleModel: vehicleModel })
+    EVVehicles.findOne({ vehicleCompany: vehicleCompany, vehicleModel: vehicleModel })
         .exec()
         .then(response => {
             if (!response) {
