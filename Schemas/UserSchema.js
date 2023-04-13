@@ -19,8 +19,10 @@ const UserSchema = new mongoose.Schema({
     },
     EVVehicleId:{
         type:String,
-        ref:'EVCars',
-        required:true
+        ref:'EVCars',        
+    },
+    type:{
+        type:String
     }
 });
 

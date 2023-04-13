@@ -17,7 +17,8 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                                 email: email,
                                 phoneNumber: phoneNumber,
                                 password: password,
-                                EVVehicleId: EVVehicleId
+                                EVVehicleId: EVVehicleId,
+                                type: "Customer"
                             }).save();
 
                             try {
@@ -31,7 +32,8 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                                                 phoneNumber: response.phoneNumber,
                                                 email: response.email,
                                                 password: response.password,
-                                                EVVehicleId: response.EVVehicleId
+                                                EVVehicleId: response.EVVehicleId,
+                                                type: response.type
                                             }
                                         })
                                     })
@@ -45,7 +47,7 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                         }
                         else {
                             res.status(404).send({
-                                message : "Vehicle doesn't exists!"
+                                message: "Vehicle doesn't exists!"
                             })
                         }
                     })
@@ -77,7 +79,8 @@ module.exports.LOGIN_USER = (async (req, res) => {
                         username: response.username,
                         email: response.email,
                         phoneNumber: response.phoneNumber,
-                        vehicle:response.EVVehicleId
+                        vehicle: response.EVVehicleId,
+                        type: response.type
                     })
                 }
                 else {
@@ -88,6 +91,59 @@ module.exports.LOGIN_USER = (async (req, res) => {
             })
             .catch(error => {
                 console.log(error);
+            })
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+module.exports.ADMIN_SIGNUP = (async (req, res) => {
+    const { username, phoneNumber, email, password, adminKey } = req.body;
+
+    try {
+        await Users.findOne({ phoneNumber: phoneNumber })
+            .exec()
+            .then(response => {
+                if (!response) {
+                    if(adminKey === process.env.admin_key){
+                        const user = new Users({
+                            username: username,
+                            email: email,
+                            phoneNumber: phoneNumber,
+                            password: password,
+                            type: "Admin"
+                        }).save();
+    
+                        try {
+                            user
+                                .then((response) => {
+                                    res.status(201).json({
+                                        message: "User created successfully!",
+                                        user: {
+                                            _id: response._id,
+                                            username: response.username,
+                                            phoneNumber: response.phoneNumber,
+                                            email: response.email,
+                                            password: response.password,                                            
+                                            type: response.type
+                                        }
+                                    })
+                                })
+                                .catch((error) => {
+                                    res.status(404).send(error);
+                                })
+                        }
+                        catch (error) {
+                            res.status(404).send(error);
+                        }
+                    }
+                    else{
+                        res.status(404).send({
+                            message : "Admin key doesn't match!"
+                        })
+                    }
+                }
             })
     }
     catch (error) {
