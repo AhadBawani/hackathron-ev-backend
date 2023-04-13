@@ -7,11 +7,13 @@ const BookedChargingStations = require('./Routes/BookedChargingStation');
 const payment = require('./Routes/Payment');
 const bodyParser = require('body-parser');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 require('dotenv/config');
 
 var dir = path.join(__dirname, "Images");
 app.use(express.static(dir));
+app.use(cors());
 app.use('/ChargingStationImages', express.static('ChargingStationImages'));
 app.use('/VehicleImages', express.static('VehicleImages'));
 app.use(bodyParser.json());
