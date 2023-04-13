@@ -2,7 +2,7 @@ const ChargingStation = require('../Schemas/ChargingStationSchema');
 const BookedChargingStation = require('../Schemas/BookedChargingStationSchema');
 
 module.exports.ADD_CHARGING_STATION = (async (req, res) => {
-    const { name, type2, CHAdeMO1, CCS_cable2, area, street, latitude, longitude, pincode } = req.body;
+    const { name, type2, CHAdeMO1, CCS_cable2, area, street, latitude, longitude, pincode } = req.body;    
 
     ChargingStation.findOne({ name: name, latitude: latitude, longitude: longitude })
         .exec()
