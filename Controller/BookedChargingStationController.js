@@ -4,7 +4,7 @@ const Users = require('../Schemas/UserSchema');
 const moment = require('moment');
 
 module.exports.ADD_BOOKING = (async (req, res) => {
-    const { userId, stationId, slotBooked, bookedTime, bookedDate, index, bookedDay } = req.body;
+    const { userId, stationId, slotBooked, bookedTime, bookedDate, index, bookedDay, razorpayId, amount } = req.body;
 
     BookedChargingStations.findOne({ bookedDate: bookedDate, stationId: stationId, index: index })
         .exec()
@@ -25,7 +25,9 @@ module.exports.ADD_BOOKING = (async (req, res) => {
                                             bookedTime: bookedTime,
                                             bookedDate: bookedDate,
                                             bookedDay: bookedDay,
-                                            index: index
+                                            index: index,
+                                            razorpayId: razorpayId,
+                                            amount: amount
                                         }).save();
 
                                         try {
@@ -40,7 +42,9 @@ module.exports.ADD_BOOKING = (async (req, res) => {
                                                             slotBooked: response.slotBooked,
                                                             bookedDate: response.bookedDate,
                                                             bookedTime: response.bookedTime,
-                                                            bookedDay: response.bookedDay
+                                                            bookedDay: response.bookedDay,
+                                                            razorpayId: response.razorpayId,
+                                                            amount: response.amount
                                                         }
                                                     })
                                                 })
@@ -98,10 +102,10 @@ module.exports.GET_AVERAGE = (async (req, res) => {
         const currentDate = moment(reversedDate);
 
         const numWeeks = Math.floor(currentDate.diff(firstOrderDate, 'weeks', true));
-        
+
         const obj = {
-            weeks:parseInt(numWeeks + 1),
-            result:result
+            weeks: parseInt(numWeeks + 1),
+            result: result
         }
         res.json(obj);
     }
@@ -112,7 +116,7 @@ module.exports.GET_AVERAGE = (async (req, res) => {
 
 module.exports.PREDICT = (async (req, res) => {
     const arr = [];
-    try{        
+    try {
         const allOrders = await BookedChargingStations.find();
         const dateString = allOrders[0].bookedDate;
         const dateObject = new Date(dateString.split('-').reverse().join('-'));
@@ -123,38 +127,38 @@ module.exports.PREDICT = (async (req, res) => {
 
         const numWeeks = Math.floor(currentDate.diff(firstOrderDate, 'weeks', true));
 
-        arr.push({ numberOfWeeks:parseInt(numWeeks + 1) })
+        arr.push({ numberOfWeeks: parseInt(numWeeks + 1) })
         const allStation = await ChargingStationSchema.find();
 
-        for(let i = 0; i < allStation.length; i++){            
-            await BookedChargingStations.find({ stationId:allStation[i]?._id })
-            .exec()
-            .then(response => {
-                const groupedOrders = response.reduce((acc, order) => {
-                    const key = `${order.bookedDate}-${order.bookedDay}`;
-                    if (!acc[key]) {
-                      acc[key] = [];
+        for (let i = 0; i < allStation.length; i++) {
+            await BookedChargingStations.find({ stationId: allStation[i]?._id })
+                .exec()
+                .then(response => {
+                    const groupedOrders = response.reduce((acc, order) => {
+                        const key = `${order.bookedDate}-${order.bookedDay}`;
+                        if (!acc[key]) {
+                            acc[key] = [];
+                        }
+                        acc[key].push(order);
+                        return acc;
+                    }, {});
+
+                    let obj = {
+                        stationId: allStation[i]._id,
+                        latitude: allStation[i].latitude,
+                        longitude: allStation[i].longitude,
+                        totalOrders: response.length,
+                        subOrders: groupedOrders
                     }
-                    acc[key].push(order);
-                    return acc;
-                  }, {});
-                  
-                let obj = {
-                    stationId:allStation[i]._id,
-                    latitude:allStation[i].latitude,
-                    longitude:allStation[i].longitude,
-                    totalOrders:response.length,
-                    subOrders : groupedOrders
-                }
-                arr.push(obj);
-            })
-            .catch(error => {
-                console.log(error);
-            });            
+                    arr.push(obj);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
         res.json(arr);
     }
-    catch(error){
+    catch (error) {
         console.log(error);
     }
 })

@@ -30,6 +30,12 @@ const BookedChargingStationSchema = new mongoose.Schema({
     index:{
         type:Number,
         required:true
+    },
+    razorpayId:{
+        type:String        
+    },
+    amount:{
+        type:Number
     }
 });
 

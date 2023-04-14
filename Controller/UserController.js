@@ -4,60 +4,46 @@ const EVVehicles = require('../Schemas/EVVehicleSchema');
 module.exports.SIGNUP_USER = (async (req, res) => {
     const { username, phoneNumber, email, password, EVVehicleId } = req.body;
 
-    await Users.findOne({ phoneNumber: phoneNumber })
+    EVVehicles.findById(EVVehicleId)
         .exec()
-        .then((response) => {
-            if (!response) {
-                EVVehicles.findById(EVVehicleId)
-                    .exec()
-                    .then(vehicleResponse => {
-                        if (vehicleResponse) {
-                            const user = new Users({
-                                username: username,
-                                email: email,
-                                phoneNumber: phoneNumber,
-                                password: password,
-                                EVVehicleId: EVVehicleId,
-                                type: "Customer"
-                            }).save();
+        .then(vehicleResponse => {
+            if (vehicleResponse) {
+                const user = new Users({
+                    username: username,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    password: password,
+                    EVVehicleId: EVVehicleId,
+                    type: "Customer"
+                }).save();
 
-                            try {
-                                user
-                                    .then((response) => {
-                                        res.status(201).json({
-                                            message: "User created successfully!",
-                                            user: {
-                                                _id: response._id,
-                                                username: response.username,
-                                                phoneNumber: response.phoneNumber,
-                                                email: response.email,
-                                                password: response.password,
-                                                EVVehicleId: vehicleResponse,
-                                                type: response.type
-                                            }
-                                        })
-                                    })
-                                    .catch((error) => {
-                                        res.status(404).send(error);
-                                    })
-                            }
-                            catch (error) {
-                                res.status(404).send(error);
-                            }
-                        }
-                        else {
-                            res.status(404).send({
-                                message: "Vehicle doesn't exists!"
+                try {
+                    user
+                        .then((response) => {
+                            res.status(201).json({
+                                message: "User created successfully!",
+                                user: {
+                                    _id: response._id,
+                                    username: response.username,
+                                    phoneNumber: response.phoneNumber,
+                                    email: response.email,
+                                    password: response.password,
+                                    EVVehicleId: vehicleResponse,
+                                    type: response.type
+                                }
                             })
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
+                        })
+                        .catch((error) => {
+                            res.status(404).send(error);
+                        })
+                }
+                catch (error) {
+                    res.status(404).send(error);
+                }
             }
             else {
                 res.status(404).send({
-                    message: "User already exist!"
+                    message: "Vehicle doesn't exists!"
                 })
             }
         })
