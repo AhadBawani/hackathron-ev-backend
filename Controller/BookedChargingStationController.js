@@ -4,7 +4,7 @@ const Users = require('../Schemas/UserSchema');
 const moment = require('moment');
 
 module.exports.ADD_BOOKING = (async (req, res) => {
-    const { userId, stationId, slotBooked, bookedTime, bookedDate, index, bookedDay, razorpayId, amount } = req.body;
+    const { userId, stationId, slotBooked, bookedTime, bookedDate, chargerType, index, bookedDay, razorpayId, amount, amountOfCharge } = req.body;
 
     BookedChargingStations.findOne({ bookedDate: bookedDate, stationId: stationId, index: index })
         .exec()
@@ -27,7 +27,9 @@ module.exports.ADD_BOOKING = (async (req, res) => {
                                             bookedDay: bookedDay,
                                             index: index,
                                             razorpayId: razorpayId,
-                                            amount: amount
+                                            amount: amount,
+                                            chargerType:chargerType,
+                                            amountOfCharge:amountOfCharge
                                         }).save();
 
                                         try {
@@ -44,7 +46,10 @@ module.exports.ADD_BOOKING = (async (req, res) => {
                                                             bookedTime: response.bookedTime,
                                                             bookedDay: response.bookedDay,
                                                             razorpayId: response.razorpayId,
-                                                            amount: response.amount
+                                                            amount: response.amount,
+                                                            chargerType:response.chargerType,
+                                                            amountOfCharge:response.amountOfCharge,
+                                                            index:response.index
                                                         }
                                                     })
                                                 })
@@ -159,6 +164,18 @@ module.exports.PREDICT = (async (req, res) => {
         res.json(arr);
     }
     catch (error) {
+        console.log(error);
+    }
+})
+
+module.exports.GET_ALL_BOOKING = (async (req, res) => {
+    const date = req.params.date;
+    try{
+        const allOrders = await BookedChargingStations.find({ bookedDate:date });
+
+        res.json(allOrders);
+    }
+    catch(error){
         console.log(error);
     }
 })

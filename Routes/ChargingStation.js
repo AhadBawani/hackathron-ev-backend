@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/', upload.single('chargingStationImage'),ChargingStationController.ADD_CHARGING_STATION);
+router.get('/demand/', ChargingStationController.DEMAND);
 router.get('/', ChargingStationController.GET_ALL_CHARGING_STATION);
 
 module.exports = router;

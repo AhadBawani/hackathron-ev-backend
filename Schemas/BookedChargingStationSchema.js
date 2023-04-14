@@ -23,6 +23,10 @@ const BookedChargingStationSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    chargerType:{
+        type:String,
+        required:true
+    },
     bookedDay :{
         type:String,
         required:true
@@ -36,6 +40,9 @@ const BookedChargingStationSchema = new mongoose.Schema({
     },
     amount:{
         type:Number
+    },
+    amountOfCharge:{
+        type:String
     }
 });
 

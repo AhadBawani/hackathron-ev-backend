@@ -88,3 +88,12 @@ module.exports.GET_ALL_CHARGING_STATION = (async (req, res) => {
         console.log(error);
     }
 })
+
+module.exports.DEMAND = (async (req, res) => {
+    try{
+        
+    }
+    catch(error){
+        console.log(error);
+    }
+})
