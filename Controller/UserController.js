@@ -10,8 +10,8 @@ module.exports.SIGNUP_USER = (async (req, res) => {
             if (!response) {
                 EVVehicles.findById(EVVehicleId)
                     .exec()
-                    .then(response => {
-                        if (response) {
+                    .then(vehicleResponse => {
+                        if (vehicleResponse) {
                             const user = new Users({
                                 username: username,
                                 email: email,
@@ -32,7 +32,7 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                                                 phoneNumber: response.phoneNumber,
                                                 email: response.email,
                                                 password: response.password,
-                                                EVVehicleId: response.EVVehicleId,
+                                                EVVehicleId: vehicleResponse,
                                                 type: response.type
                                             }
                                         })
@@ -84,9 +84,9 @@ module.exports.LOGIN_USER = (async (req, res) => {
                             type: response.type
                         })
                     }
-                    else{
+                    else {
                         res.status(400).send({
-                            message : "Invalid Password!"
+                            message: "Invalid Password!"
                         })
                     }
                 }
