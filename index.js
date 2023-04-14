@@ -25,7 +25,7 @@ app.use('/BookChargingStation', BookedChargingStations);
 app.use('/Payment', payment);
 
 app.get('/', (req, res) => {
-    res.send("We are at home v3.1.1......");
+    res.send("We are at home v3.1.2......");
 })
 
 app.use((req, res) => {
