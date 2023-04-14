@@ -4,60 +4,46 @@ const EVVehicles = require('../Schemas/EVVehicleSchema');
 module.exports.SIGNUP_USER = (async (req, res) => {
     const { username, phoneNumber, email, password, EVVehicleId } = req.body;
 
-    await Users.findOne({ phoneNumber: phoneNumber })
+    EVVehicles.findById(EVVehicleId)
         .exec()
-        .then((response) => {
-            if (!response) {
-                EVVehicles.findById(EVVehicleId)
-                    .exec()
-                    .then(response => {
-                        if (response) {
-                            const user = new Users({
-                                username: username,
-                                email: email,
-                                phoneNumber: phoneNumber,
-                                password: password,
-                                EVVehicleId: EVVehicleId,
-                                type: "Customer"
-                            }).save();
+        .then(response => {
+            if (response) {
+                const user = new Users({
+                    username: username,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    password: password,
+                    EVVehicleId: EVVehicleId,
+                    type: "Customer"
+                }).save();
 
-                            try {
-                                user
-                                    .then((response) => {
-                                        res.status(201).json({
-                                            message: "User created successfully!",
-                                            user: {
-                                                _id: response._id,
-                                                username: response.username,
-                                                phoneNumber: response.phoneNumber,
-                                                email: response.email,
-                                                password: response.password,
-                                                EVVehicleId: response.EVVehicleId,
-                                                type: response.type
-                                            }
-                                        })
-                                    })
-                                    .catch((error) => {
-                                        res.status(404).send(error);
-                                    })
-                            }
-                            catch (error) {
-                                res.status(404).send(error);
-                            }
-                        }
-                        else {
-                            res.status(404).send({
-                                message: "Vehicle doesn't exists!"
+                try {
+                    user
+                        .then((response) => {
+                            res.status(201).json({
+                                message: "User created successfully!",
+                                user: {
+                                    _id: response._id,
+                                    username: response.username,
+                                    phoneNumber: response.phoneNumber,
+                                    email: response.email,
+                                    password: response.password,
+                                    EVVehicleId: response.EVVehicleId,
+                                    type: response.type
+                                }
                             })
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
+                        })
+                        .catch((error) => {
+                            res.status(404).send(error);
+                        })
+                }
+                catch (error) {
+                    res.status(404).send(error);
+                }
             }
             else {
                 res.status(404).send({
-                    message: "User already exist!"
+                    message: "Vehicle doesn't exists!"
                 })
             }
         })
@@ -106,7 +92,7 @@ module.exports.ADMIN_SIGNUP = (async (req, res) => {
             .exec()
             .then(response => {
                 if (!response) {
-                    if(adminKey === process.env.admin_key){
+                    if (adminKey === process.env.admin_key) {
                         const user = new Users({
                             username: username,
                             email: email,
@@ -114,7 +100,7 @@ module.exports.ADMIN_SIGNUP = (async (req, res) => {
                             password: password,
                             type: "Admin"
                         }).save();
-    
+
                         try {
                             user
                                 .then((response) => {
@@ -125,7 +111,7 @@ module.exports.ADMIN_SIGNUP = (async (req, res) => {
                                             username: response.username,
                                             phoneNumber: response.phoneNumber,
                                             email: response.email,
-                                            password: response.password,                                            
+                                            password: response.password,
                                             type: response.type
                                         }
                                     })
@@ -138,9 +124,9 @@ module.exports.ADMIN_SIGNUP = (async (req, res) => {
                             res.status(404).send(error);
                         }
                     }
-                    else{
+                    else {
                         res.status(404).send({
-                            message : "Admin key doesn't match!"
+                            message: "Admin key doesn't match!"
                         })
                     }
                 }
