@@ -6,8 +6,8 @@ module.exports.SIGNUP_USER = (async (req, res) => {
 
     EVVehicles.findById(EVVehicleId)
         .exec()
-        .then(response => {
-            if (response) {
+        .then(vehicleResponse => {
+            if (vehicleResponse) {
                 const user = new Users({
                     username: username,
                     email: email,
@@ -28,7 +28,7 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                                     phoneNumber: response.phoneNumber,
                                     email: response.email,
                                     password: response.password,
-                                    EVVehicleId: response.EVVehicleId,
+                                    EVVehicleId: vehicleResponse,
                                     type: response.type
                                 }
                             })

@@ -171,7 +171,7 @@ module.exports.PREDICT = (async (req, res) => {
 module.exports.GET_ALL_BOOKING = (async (req, res) => {
     const date = req.params.date;
     try{
-        const allOrders = await BookedChargingStations.find({ bookedDate:date });
+        const allOrders = await BookedChargingStations.find();
 
         res.json(allOrders);
     }
