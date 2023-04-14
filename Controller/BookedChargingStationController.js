@@ -76,3 +76,64 @@ module.exports.ADD_BOOKING = (async (req, res) => {
             console.log(error);
         })
 })
+
+module.exports.PREDICT = (async (req, res) => {
+    const arr = [];
+    try {
+        const allOrders = await BookedChargingStations.find();
+        const dateString = allOrders[0].bookedDate;
+        const dateObject = new Date(dateString.split('-').reverse().join('-'));
+        const reversedDate = dateObject.toISOString().slice(0, 10);
+
+        const firstOrderDate = moment();
+        const currentDate = moment(reversedDate);
+
+        const numWeeks = Math.floor(currentDate.diff(firstOrderDate, 'weeks', true));
+
+        arr.push({ numberOfWeeks: parseInt(numWeeks + 1) })
+        const allStation = await ChargingStationSchema.find();
+
+        for (let i = 0; i < allStation.length; i++) {
+            await BookedChargingStations.find({ stationId: allStation[i]?._id })
+                .exec()
+                .then(response => {
+                    const groupedOrders = response.reduce((acc, order) => {
+                        const key = `${order.bookedDate}-${order.bookedDay}`;
+                        if (!acc[key]) {
+                            acc[key] = [];
+                        }
+                        acc[key].push(order);
+                        return acc;
+                    }, {});
+
+                    let obj = {
+                        stationId: allStation[i]._id,
+                        latitude: allStation[i].latitude,
+                        longitude: allStation[i].longitude,
+                        totalOrders: response.length,
+                        subOrders: groupedOrders
+                    }
+                    arr.push(obj);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+        res.json(arr);
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+module.exports.GET_ALL_BOOKING = (async (req, res) => {
+    const date = req.params.date;
+    try{
+        const allOrders = await BookedChargingStations.find({ bookedDate:date });
+
+        res.json(allOrders);
+    }
+    catch(error){
+        console.log(error);
+    }
+})
